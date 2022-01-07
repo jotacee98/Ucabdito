@@ -35,6 +35,26 @@ class TiendaController extends Controller
      */
     public function store(Request $request)
     {   
+
+        //Inicio de las validaciones
+        $rules =  [
+            'titulo' => 'required|unique:tiendas',
+            'dueno_id' => 'required|unique:tiendas',
+            'img.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+        ];        
+
+        
+        $validator = \Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return [
+                'created' => false,
+                'errors'  => $validator->errors()->all()
+            ];
+        }
+
+        //Fin de las validaciones
+
+
         //Imagen Home
         $image=$request->file('imagen_home') ;
         $imagen_home = date('His').$image->getClientOriginalName();
@@ -53,7 +73,7 @@ class TiendaController extends Controller
         $tienda->dueno_id               = $request->input('dueno_id');
         $tienda->save();
 
-        return response()->json(['message'=>'Se creo la imagen exitosamente']);
+        return response()->json(['message'=>'Store Registered Successfully']);
     }
 
     /**
