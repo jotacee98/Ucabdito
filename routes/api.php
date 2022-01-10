@@ -23,3 +23,6 @@ Route::post('/tienda/{tienda} ', 'TiendaController@update');
 
 Route::resource('producto','ProductoController');
 Route::post('/producto/{producto} ', 'ProductoController@update');
+
+Route::resource('Usuario','UsuarioController');
+Route::post('/usuario/{usuario} ', 'UsuarioController@update');
