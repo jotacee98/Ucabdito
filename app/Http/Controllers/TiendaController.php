@@ -14,7 +14,7 @@ class TiendaController extends Controller
      */
     public function index()
     {
-        return Tienda::all();
+        return json_encode(Tienda::all());
     }
 
     /**
@@ -74,7 +74,7 @@ class TiendaController extends Controller
      */
     public function show($id)
     {
-        return Tienda::findOrFail($id);
+        return json_encode(Tienda::findOrFail($id));
     }
 
     /**
