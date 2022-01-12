@@ -62,7 +62,7 @@ class ProductoController extends Controller
 
         $producto->save();
 
-        return response()->json(['message'=>'Product Registered Successfully']);
+        return response()->json(['message'=>'Product Registered Successfully','producto'=>$producto]);
     }
 
     /**
@@ -87,11 +87,10 @@ class ProductoController extends Controller
         //Inicio de las validaciones
         $rules =  [
             'titulo' => 'required',
-            'tienda_id' => 'required|Integer',
             'cantidad' => 'required|Integer',
             'estado_publicado' => 'required|Integer',
             'descripcion' => 'required|String',
-            'img.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            //'img.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ];        
 
         
@@ -107,20 +106,24 @@ class ProductoController extends Controller
 
 
         //Imagen Principal
-        $image=$request->file('imagen_principal') ;
+      /*  $image=$request->file('imagen_principal') ;
         $imagen_principal = date('His').$image->getClientOriginalName();
-        $image->move(public_path().'/uploads/', $imagen_principal);
+        $image->move(public_path().'/uploads/', $imagen_principal);*/
 
         $producto=Producto::findOrFail($id);
         $producto->titulo                    = $request->input('titulo');
-        $producto->ruta_imagen_principal     = $imagen_principal;
-        $producto->tienda_id                 = $request->input('tienda_id');
+       // $producto->ruta_imagen_principal     = $imagen_principal;
+        //$producto->tienda_id                 = $request->input('tienda_id');
         $producto->cantidad                  = $request->input('cantidad');
         $producto->estado_publicado          = $request->input('estado_publicado');
         $producto->descripcion               = $request->input('descripcion');
 
         $producto->update();
 
-        return response()->json(['message'=>'Product Was Updated Successfully']);
+        return response()->json(['message'=>'Product Was Updated Successfully','producto'=>$producto]);
+    }
+
+    public function getAllProductosByTiendaId($tienda_id){
+       return json_encode(Producto::where('tienda_id',$tienda_id)->get());
     }
 }

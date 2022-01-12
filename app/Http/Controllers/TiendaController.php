@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Tienda;
+use App\Usuario;
+use App\Producto;
 
 class TiendaController extends Controller
 {
@@ -72,9 +74,18 @@ class TiendaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($tienda_id)
     {
-        return json_encode(Tienda::findOrFail($id));
+        $tienda=Tienda::findOrFail($tienda_id);
+        $dueno_id= $tienda->dueno_id;
+        $dueno= Usuario::findOrFail($dueno_id);
+        $productos = Producto::where('tienda_id',$tienda_id)->get();
+        $data=[
+            'tienda' => $tienda,
+            'dueno'  => $dueno,
+            'productos' => $productos
+        ];
+        return json_encode($data);
     }
 
     /**
@@ -86,11 +97,11 @@ class TiendaController extends Controller
      */
     public function update(Request $request, $id)
     {
-
+        //return $request;
          //Inicio de las validaciones
          $rules =  [
             'titulo' => 'required|unique:tiendas',
-            'dueno_id' => 'required|unique:tiendas',
+            'dueno_id' => 'required',
             'img.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ];        
 
@@ -107,22 +118,22 @@ class TiendaController extends Controller
 
 
         //Imagen Home
-        $image=$request->file('imagen_home') ;
+      /*  $image=$request->file('imagen_home') ;
         $imagen_home = date('His').$image->getClientOriginalName();
         $image->move(public_path().'/uploads/', $imagen_home);
 
         //imagen_principal
         $image=$request->file('imagen_principal') ;
         $imagen_principal = date('His').$image->getClientOriginalName();
-        $image->move(public_path().'/uploads/', $imagen_principal);
+        $image->move(public_path().'/uploads/', $imagen_principal);*/
       
         $tienda=Tienda::findOrFail($id);
         $tienda->titulo                 = $request->input('titulo');
-        $tienda->ruta_imagen_home       = $imagen_home;
-        $tienda->ruta_imagen_principal  = $imagen_principal;
+       // $tienda->ruta_imagen_home       = $imagen_home;
+       // $tienda->ruta_imagen_principal  = $imagen_principal;
         $tienda->dueno_id               = $request->input('dueno_id');
         $tienda->update();
 
-        return response()->json(['message'=>'Store Was Updated Successfully']);
+        return response()->json(['message'=>'Store Was Updated Successfully','tienda'=>$tienda]);
     }
 }
