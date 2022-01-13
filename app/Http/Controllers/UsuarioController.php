@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Usuario;
 use App\Tienda;
+use App\Sesiones;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -45,12 +46,17 @@ class UsuarioController extends Controller
             ];
         }
 
-            //Fin de las validaciones
+        $usuario_username=Usuario::where('username',$request->input('username'))->get();
 
-        //imagen_principal
-        $image=$request->file('imagen_principal') ;
-        $imagen_principal = date('His').$image->getClientOriginalName();
-        $image->move(public_path().'/uploads/', $imagen_principal);
+        if(sizeof($usuario_username)>0) return response()->json([ 'created' => false,'errors'=>['El nombre de usuario ya se encuentra registrado']]);
+        else{
+        $usuario_email=Usuario::where('email',$request->input('email'))->get();
+        if(sizeof($usuario_email)>0) return response()->json([ 'created' => false,'errors'=>['El email de usuario ya se encuentra registrado']]);
+        }
+
+        //Fin de las validaciones
+
+    
 
         if($request->input('is_ucabista')==false)   $is_not_ucabista=true;
         else                                        $is_not_ucabista=false;
@@ -62,11 +68,10 @@ class UsuarioController extends Controller
         $usuario->last_name                 = $request->input('last_name');
         $usuario->ruta_imagen_principal     = 'default.jpg';
         $usuario->email                     = $request->input('email');
-        $usuario->password                  = $request->input('password');
+        $usuario->password                  = md5($request->input('password'));
         $usuario->is_ucabista               = $request->input('is_ucabista');
         $usuario->is_not_ucabista           = !$request->input('is_ucabista');
         $usuario->is_dueño                  = $request->input('is_dueño');
-       // return $usuario;
         $usuario->save();
 
         return response()->json(['message'=>'User Registered Successfully','usuario' => $usuario]);
@@ -100,12 +105,13 @@ class UsuarioController extends Controller
         //return $request;
 
         $rules =  [
-            'username'      => 'required|String',
-            'email'         => 'required|String|email',
             'first_name'    => 'required|String',
-            'last_name'     => 'required|String'
+            'last_name'     => 'required|String',
+            'username'      => 'required|String',
+            'email'         => 'required|String',
+            'password'      => 'required|String',
+            'img.*'         => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ];      
-
        
         
         $validator = Validator::make($request->all(), $rules);
@@ -117,7 +123,12 @@ class UsuarioController extends Controller
         }
 
         $usuario_username=Usuario::where('username',$request->input('username'))->get();
-        if(empty($usuario_username)) return response()->json(['message'=>'El nombre de usuario ya se encuentra registrado']);
+
+        if(sizeof($usuario_username)>0) return response()->json([ 'created' => false,'errors'=>['El nombre de usuario ya se encuentra registrado']]);
+        else{
+        $usuario_email=Usuario::where('email',$request->input('email'))->get();
+        if(sizeof($usuario_email)>0) return response()->json([ 'created' => false,'errors'=>['El email de usuario ya se encuentra registrado']]);
+        }
         
             //Fin de las validaciones
 
@@ -129,18 +140,21 @@ class UsuarioController extends Controller
       
 
         $usuario=Usuario::findOrFail($id);        
-        $usuario->username                = $request->input('username');
+        $usuario->username                  = $request->input('username');
         $usuario->first_name                = $request->input('first_name');
         $usuario->last_name                 = $request->input('last_name');
         $usuario->ruta_imagen_principal     = $imagen_principal;
         $usuario->email                     = $request->input('email');
-        $usuario->password                  = $request->input('password');
-        $usuario->is_ucabista               = $request->input('is_ucabista');
-        $usuario->is_not_ucabista           = $request->input('is_not_ucabista');
-        $usuario->is_dueño                  = $request->input('is_dueño');
+        $usuario->password                  = md5($request->input('password'));
         $usuario->update();
 
-        return response()->json(['message'=>'User Updated Successfully','user'=>$usuario]);
+        return response()->json([ 'updated' => true,'message'=>'User Updated Successfully','usuario' => $usuario]);
+    }
+
+    public function logOut(){
+        session_start();
+        if(session_destroy()) return 'Se elimino la sesion exitosamente';
+        else return 'Ocurrio un error al eliminar la sesion';
     }
 
     public function login(Request $request){
@@ -160,10 +174,18 @@ class UsuarioController extends Controller
         }
 
         $email=$request->input('email');
-        $password=$request->input('password');
+        $password=md5($request->input('password'));
 
         $usuario=Usuario::where(['email'=>$email,'password'=>$password])->get();
-        return $usuario;
+        if(sizeof($usuario)==0) return response()->json([ 'login' => false,'errors'=>['No se encontro un usuario con las credenciales']]);
+    
+        $token=md5($email.$password.date('His'));
+        $session= new sesiones();
+        $session->token=$token;
+        $session->save();
+        $usuario->token=$token;
+
+        return response()->json(['login' => true,'session' => $session,'usuario'=>$usuario]);
     }
 
     public function storeDuenoDeNegocio(Request $request)
@@ -213,7 +235,7 @@ class UsuarioController extends Controller
         $usuario->last_name                 = $request->input('last_name');
         $usuario->ruta_imagen_principal     = $imagen_principal;
         $usuario->email                     = $request->input('email');
-        $usuario->password                  = $request->input('password');
+        $usuario->password                  = md5($request->input('password'));
         $usuario->is_ucabista               = false;
         $usuario->is_not_ucabista           = false;
         $usuario->is_dueño                  = true;
@@ -223,8 +245,8 @@ class UsuarioController extends Controller
 
         $tienda = new Tienda();
         $tienda->titulo                 = $request->input('titulo');
-        $tienda->ruta_imagen_home       = $imagen_principal;
-        $tienda->ruta_imagen_principal  = $imagen_principal;
+        $tienda->ruta_imagen_home       = $image_tienda;
+        $tienda->ruta_imagen_principal  = $image_tienda;
         $tienda->dueno_id               = $usuario->id;
         $tienda->save();
 

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Tienda;
 use App\Usuario;
 use App\Producto;
+use Illuminate\Support\Facades\Validator;
+use App\Sesiones;
 
 class TiendaController extends Controller
 {
@@ -15,7 +17,18 @@ class TiendaController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
+    {   
+        session_start();
+        if(!isset($_SESSION['user'])) return response()->json(['message'=>'Inicie sesion primero']);
+        
+        return json_encode(Tienda::all());
+    }
+
+    public function getAllTiendas($token)
+    {   
+        $sesion= Sesiones::where('token',$token)->get();
+        if(sizeof($sesion)==0) return response()->json(['message'=>'Inicie sesion primero']);
+        
         return json_encode(Tienda::all());
     }
 
@@ -36,7 +49,7 @@ class TiendaController extends Controller
         ];        
 
         
-        $validator = \Validator::make($request->all(), $rules);
+        $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             return [
                 'created' => false,
@@ -97,16 +110,15 @@ class TiendaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //return $request;
-         //Inicio de las validaciones
-         $rules =  [
+        $rules =  [
             'titulo' => 'required|unique:tiendas',
             'dueno_id' => 'required',
-            'img.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            'img.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'titulo'        => 'required|unique:tiendas',
         ];        
 
         
-        $validator = \Validator::make($request->all(), $rules);
+        $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             return [
                 'created' => false,
@@ -117,20 +129,14 @@ class TiendaController extends Controller
         //Fin de las validaciones
 
 
-        //Imagen Home
-      /*  $image=$request->file('imagen_home') ;
-        $imagen_home = date('His').$image->getClientOriginalName();
-        $image->move(public_path().'/uploads/', $imagen_home);
-
-        //imagen_principal
-        $image=$request->file('imagen_principal') ;
-        $imagen_principal = date('His').$image->getClientOriginalName();
-        $image->move(public_path().'/uploads/', $imagen_principal);*/
+        $image_tienda=$request->file('imagen_tienda');
+        $image_tiendaprincipal = date('His').$image_tienda->getClientOriginalName();
+        $image_tienda->move(public_path().'/uploads/', $image_tiendaprincipal);
       
         $tienda=Tienda::findOrFail($id);
         $tienda->titulo                 = $request->input('titulo');
-       // $tienda->ruta_imagen_home       = $imagen_home;
-       // $tienda->ruta_imagen_principal  = $imagen_principal;
+        $tienda->ruta_imagen_home       = $image_tiendaprincipal;
+        $tienda->ruta_imagen_principal  = $image_tiendaprincipal;
         $tienda->dueno_id               = $request->input('dueno_id');
         $tienda->update();
 

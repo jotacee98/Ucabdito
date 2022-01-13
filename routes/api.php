@@ -27,5 +27,7 @@ Route::post('/producto/{producto} ', 'ProductoController@update');
 Route::resource('usuario','UsuarioController');
 Route::post('/usuario/{usuario} ', 'UsuarioController@update');
 Route::post('/usuarioLogin ', 'UsuarioController@login');
+Route::post('/usuarioLogOut ', 'UsuarioController@logOut');
 Route::post('/storeDuenoDeNegocio ', 'UsuarioController@storeDuenoDeNegocio');
 Route::get('/productos/tienda/{tiendaid} ', 'ProductoController@getAllProductosByTiendaId');
+Route::get('/getAllTiendas/{token} ', 'TiendaController@getAllTiendas');
