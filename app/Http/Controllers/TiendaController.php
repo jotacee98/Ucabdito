@@ -32,6 +32,10 @@ class TiendaController extends Controller
         return json_encode(Tienda::all());
     }
 
+    public function getAllTiendas2(){
+        return $this->getAllTiendas('');
+    }
+
     /**
      * Store a newly created resource in storage.
      *

@@ -33,7 +33,7 @@ class UsuarioController extends Controller
             'first_name'    => 'required|String',
             'last_name'     => 'required|String',
             'username'      => 'required|String',
-            'email'         => 'required|String',
+            'email'         => 'required|String|email',
             'password'      => 'required|String',
             'img.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ];      
@@ -54,6 +54,8 @@ class UsuarioController extends Controller
         if(sizeof($usuario_email)>0) return response()->json([ 'created' => false,'errors'=>['El email de usuario ya se encuentra registrado']]);
         }
 
+        if($request->input('is_ucabista') && !strpos($request->input('email'),'ucab.edu.ve'))  return response()->json([ 'created' => false,'errors'=>['El correo ucabista debe de ser valido']]);
+
         //Fin de las validaciones
 
     
@@ -71,7 +73,7 @@ class UsuarioController extends Controller
         $usuario->password                  = md5($request->input('password'));
         $usuario->is_ucabista               = $request->input('is_ucabista');
         $usuario->is_not_ucabista           = !$request->input('is_ucabista');
-        $usuario->is_dueño                  = $request->input('is_dueño');
+        $usuario->is_dueño                  = false;
         $usuario->save();
 
         return response()->json(['message'=>'User Registered Successfully','usuario' => $usuario]);
@@ -97,8 +99,9 @@ class UsuarioController extends Controller
      */
     public function update(Request $request, $id)
     {
-
-
+        $token=$request->input('token');
+        $sesion= Sesiones::where('token',$token)->get();
+        if(sizeof($sesion)==0) return response()->json(['message'=>'Inicie sesion primero']);
     
         //INICIO DE LAS VALIDACIONES
 
@@ -122,6 +125,8 @@ class UsuarioController extends Controller
             ]);
         }
 
+    
+
         $usuario_username=Usuario::where('username',$request->input('username'))->get();
 
         if(sizeof($usuario_username)>0) return response()->json([ 'created' => false,'errors'=>['El nombre de usuario ya se encuentra registrado']]);
@@ -130,6 +135,9 @@ class UsuarioController extends Controller
         if(sizeof($usuario_email)>0) return response()->json([ 'created' => false,'errors'=>['El email de usuario ya se encuentra registrado']]);
         }
         
+        $usuario=Usuario::findOrFail($id);    
+
+        if($usuario->is_ucabita && !strpos($request->input('email'),'ucab.edu.ve'))  return response()->json([ 'created' => false,'errors'=>['El correo ucabista debe de ser valido']]);
             //Fin de las validaciones
 
         //imagen_principal
@@ -139,7 +147,7 @@ class UsuarioController extends Controller
 
       
 
-        $usuario=Usuario::findOrFail($id);        
+           
         $usuario->username                  = $request->input('username');
         $usuario->first_name                = $request->input('first_name');
         $usuario->last_name                 = $request->input('last_name');

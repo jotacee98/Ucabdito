@@ -31,3 +31,4 @@ Route::post('/usuarioLogOut ', 'UsuarioController@logOut');
 Route::post('/storeDuenoDeNegocio ', 'UsuarioController@storeDuenoDeNegocio');
 Route::get('/productos/tienda/{tiendaid} ', 'ProductoController@getAllProductosByTiendaId');
 Route::get('/getAllTiendas/{token} ', 'TiendaController@getAllTiendas');
+Route::get('/getAllTiendas ', 'TiendaController@getAllTiendas2');
