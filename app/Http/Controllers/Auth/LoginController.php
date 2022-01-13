@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -18,22 +19,21 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers;
+    Public function login(){
+        $credentials = $this->validate(request(),[
+            'email' => 'email|required|string',
+            'password' => 'password|required|string'
+        ]);
 
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/home';
+        if(Auth::attempt($credentials))
+        {
+            return 'Inicio de sesión satisfactorio';
+        }
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('guest')->except('logout');
+        return back()
+            ->withErrors(['email' => trans('auth.failed')])
+            ->withInput(request(['email']));
+
     }
+
 }
