@@ -61,7 +61,7 @@ class ProductoController extends Controller
 
 
         //Imagen Principal
-        $image=$request->file('imagen_principal') ;
+        $image=$request->file('imagen_producto') ;
         $imagen_principal = date('His').$image->getClientOriginalName();
         $image->move(public_path().'/uploads/', $imagen_principal);
 
@@ -74,8 +74,8 @@ class ProductoController extends Controller
         $producto->descripcion               = $request->input('descripcion');
 
         $producto->save();
-
-        return response()->json(['message'=>'Product Registered Successfully','producto'=>$producto]);
+        $productos=Producto::where('tienda_id',$request->input('tienda_id'))->get();
+        return response()->json(['message'=>'Product Registered Successfully','productos'=>$productos]);
     }
 
     /**

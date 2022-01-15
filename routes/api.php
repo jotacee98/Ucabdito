@@ -26,7 +26,6 @@ Route::post('/usuarioLogin ', 'UsuarioController@login');
 Route::post('/usuarioLogOut ', 'UsuarioController@logOut');
 Route::get('/getAllTiendas/{token} ', 'TiendaController@getAllTiendas');
 Route::get('/getAllTiendas ', 'TiendaController@getAllTiendas2');
-Route::resource('producto','ProductoController');
 
 Route::group([
     'middleware' => 'api',
@@ -44,5 +43,6 @@ Route::group([
     Route::post('/storeDuenoDeNegocio ', 'UsuarioController@storeDuenoDeNegocio');
     Route::post('/usuario/{usuario} ', 'UsuarioController@update');
     Route::post('/tienda/{tienda} ', 'TiendaController@update');
+    Route::resource('producto','ProductoController');
 
 });
