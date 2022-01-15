@@ -103,7 +103,7 @@ class ProductoController extends Controller
             'cantidad' => 'required|Integer',
             'estado_publicado' => 'required|Integer',
             'descripcion' => 'required|String',
-            //'img.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            'img.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ];        
 
         
@@ -119,14 +119,13 @@ class ProductoController extends Controller
 
 
         //Imagen Principal
-      /*  $image=$request->file('imagen_principal') ;
+       $image=$request->file('imagen_producto') ;
         $imagen_principal = date('His').$image->getClientOriginalName();
-        $image->move(public_path().'/uploads/', $imagen_principal);*/
+        $image->move(public_path().'/uploads/', $imagen_principal);
 
         $producto=Producto::findOrFail($id);
         $producto->titulo                    = $request->input('titulo');
-       // $producto->ruta_imagen_principal     = $imagen_principal;
-        //$producto->tienda_id                 = $request->input('tienda_id');
+        $producto->ruta_imagen_principal     = $imagen_principal;
         $producto->cantidad                  = $request->input('cantidad');
         $producto->estado_publicado          = $request->input('estado_publicado');
         $producto->descripcion               = $request->input('descripcion');
