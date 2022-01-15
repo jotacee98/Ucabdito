@@ -79,16 +79,16 @@ class AuthController extends Controller
     protected function respondWithToken($token)
     {
         return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60,
-            'login'    => true
+            'access_token'   => $token,
+            'token_type'     => 'bearer',
+            'expires_in'     => auth()->factory()->getTTL() * 60,
+            'login'          => true,
+            'user'           => auth()->user()
         ]);
     }
 
     public function register(Request $request){
 
-        return $request;
         //INICIO DE LAS VALIDACIONES
         $rules =  [
             'first_name'    => 'required|String',

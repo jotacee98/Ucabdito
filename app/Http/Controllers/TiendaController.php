@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Tienda;
-use App\Usuario;
+use App\User;
 use App\Producto;
 use Illuminate\Support\Facades\Validator;
 use App\Sesiones;
@@ -100,7 +100,7 @@ class TiendaController extends Controller
     {
         $tienda=Tienda::findOrFail($tienda_id);
         $dueno_id= $tienda->dueno_id;
-        $dueno= Usuario::findOrFail($dueno_id);
+        $dueno= User::findOrFail($dueno_id);
         $productos = Producto::where('tienda_id',$tienda_id)->get();
         $data=[
             'tienda' => $tienda,

@@ -24,10 +24,9 @@ Route::post('/tienda/{tienda} ', 'TiendaController@update');
 
 
 Route::resource('usuario','UsuarioController');
-Route::post('/usuario/{usuario} ', 'UsuarioController@update');
+
 Route::post('/usuarioLogin ', 'UsuarioController@login');
 Route::post('/usuarioLogOut ', 'UsuarioController@logOut');
-Route::post('/storeDuenoDeNegocio ', 'UsuarioController@storeDuenoDeNegocio');
 Route::get('/getAllTiendas/{token} ', 'TiendaController@getAllTiendas');
 Route::get('/getAllTiendas ', 'TiendaController@getAllTiendas2');
 Route::resource('producto','ProductoController');
@@ -45,5 +44,7 @@ Route::group([
     Route::resource('tienda','TiendaController');
     Route::get('/productos/tienda/{tiendaid} ', 'ProductoController@getAllProductosByTiendaId');
     Route::post('/producto/{producto} ', 'ProductoController@update');
+    Route::post('/storeDuenoDeNegocio ', 'UsuarioController@storeDuenoDeNegocio');
+    Route::post('/usuario/{usuario} ', 'UsuarioController@update');
 
 });
