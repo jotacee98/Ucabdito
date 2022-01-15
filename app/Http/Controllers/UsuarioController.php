@@ -108,10 +108,6 @@ class UsuarioController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $token=$request->input('token');
-        $sesion= Sesiones::where('token',$token)->get();
-        if(sizeof($sesion)==0) return response()->json(['message'=>'Inicie sesion primero']);
-    
         //INICIO DE LAS VALIDACIONES
 
         //return $request;

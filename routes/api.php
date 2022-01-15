@@ -18,9 +18,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-Route::post('/tienda/{tienda} ', 'TiendaController@update');
-
-
 
 
 Route::resource('usuario','UsuarioController');
@@ -46,5 +43,6 @@ Route::group([
     Route::post('/producto/{producto} ', 'ProductoController@update');
     Route::post('/storeDuenoDeNegocio ', 'UsuarioController@storeDuenoDeNegocio');
     Route::post('/usuario/{usuario} ', 'UsuarioController@update');
+    Route::post('/tienda/{tienda} ', 'TiendaController@update');
 
 });
