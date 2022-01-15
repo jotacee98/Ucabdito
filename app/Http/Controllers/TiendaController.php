@@ -12,6 +12,17 @@ use App\Sesiones;
 class TiendaController extends Controller
 {
     /**
+     * Create a new AuthController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+       $this->middleware('auth:api', ['except' => ['']]);
+    }
+
+    
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
