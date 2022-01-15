@@ -7,6 +7,7 @@ use App\Tienda;
 use App\Sesiones;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class UsuarioController extends Controller
 {
@@ -94,9 +95,9 @@ class UsuarioController extends Controller
      * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function show($username)
+    public function show($id)
     {
-        return User::findOrFail($username);
+        return User::findOrFail($id);
     }
 
     /**
@@ -203,7 +204,6 @@ class UsuarioController extends Controller
 
     public function storeDuenoDeNegocio(Request $request)
     {
-        //return $request;
         //INICIO DE LAS VALIDACIONES
         $rules =  [
             'first_name'    => 'required|String',
@@ -242,8 +242,6 @@ class UsuarioController extends Controller
         $image_tienda_principal = date('His').$image_tienda->getClientOriginalName();
         $image_tienda->move(public_path().'/uploads/', $image_tienda_principal);
 
-        //return $request;
-        //return $imagen_principal;
         $user = new user();
         $user->name                      ='empty';
         $user->username                  = $request->input('username');
@@ -267,6 +265,10 @@ class UsuarioController extends Controller
         $tienda->save();
 
         return response()->json([ 'created' => true,'message'=>'User And Store Registered Successfully','user' => $user,'tienda'=>$tienda]);
+    }
+
+    public function getAllUsers(){
+        return DB::SELECT('SELECT id,username,email,is_ucabista  FROM users where is_dueño=? and email!=?',[false,'admin@admin.com']);
     }
 
 }

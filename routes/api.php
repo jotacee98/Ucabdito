@@ -20,7 +20,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 
 
-Route::resource('usuario','UsuarioController');
 
 Route::post('/usuarioLogin ', 'UsuarioController@login');
 Route::post('/usuarioLogOut ', 'UsuarioController@logOut');
@@ -44,5 +43,7 @@ Route::group([
     Route::post('/usuario/{usuario} ', 'UsuarioController@update');
     Route::post('/tienda/{tienda} ', 'TiendaController@update');
     Route::resource('producto','ProductoController');
+    Route::get('/getAllUsers ', 'UsuarioController@getAllUsers');
+    Route::resource('usuario','UsuarioController');
 
 });
