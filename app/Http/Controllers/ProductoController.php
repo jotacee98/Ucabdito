@@ -4,9 +4,22 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Producto;
+use App\Tienda;
 
 class ProductoController extends Controller
 {
+
+    /**
+     * Create a new AuthController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+       $this->middleware('auth:api', ['except' => ['']]);
+    }
+
+    
     /**
      * Display a listing of the resource.
      *
@@ -124,6 +137,9 @@ class ProductoController extends Controller
     }
 
     public function getAllProductosByTiendaId($tienda_id){
-       return json_encode(Producto::where('tienda_id',$tienda_id)->get());
+        
+        $productos=Producto::where('tienda_id',$tienda_id)->get();
+        $tienda=Tienda::where('id',$tienda_id)->get();
+        return json_encode(['productos'=>$productos,'tienda' => $tienda]);
     }
 }

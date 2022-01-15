@@ -18,17 +18,11 @@ class TiendaController extends Controller
      */
     public function index()
     {   
-        session_start();
-        if(!isset($_SESSION['user'])) return response()->json(['message'=>'Inicie sesion primero']);
-        
         return json_encode(Tienda::all());
     }
 
-    public function getAllTiendas($token)
+    public function getAllTiendas()
     {   
-        $sesion= Sesiones::where('token',$token)->get();
-        if(sizeof($sesion)==0) return response()->json(['message'=>'Inicie sesion primero']);
-        
         return json_encode(Tienda::all());
     }
 

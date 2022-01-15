@@ -31,7 +31,7 @@ class AuthController extends Controller
         $credentials = request(['email', 'password']);
 
         if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Unauthorized','login'=>'false']);
         }
 
         return $this->respondWithToken($token);
@@ -81,11 +81,14 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'expires_in' => auth()->factory()->getTTL() * 60,
+            'login'    => true
         ]);
     }
 
     public function register(Request $request){
+
+        return $request;
         //INICIO DE LAS VALIDACIONES
         $rules =  [
             'first_name'    => 'required|String',
