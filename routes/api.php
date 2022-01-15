@@ -32,3 +32,19 @@ Route::post('/storeDuenoDeNegocio ', 'UsuarioController@storeDuenoDeNegocio');
 Route::get('/productos/tienda/{tiendaid} ', 'ProductoController@getAllProductosByTiendaId');
 Route::get('/getAllTiendas/{token} ', 'TiendaController@getAllTiendas');
 Route::get('/getAllTiendas ', 'TiendaController@getAllTiendas2');
+
+
+Route::group([
+
+    'middleware' => 'api',
+    'prefix' => 'auth'
+
+], function ($router) {
+
+    Route::post('login', 'AuthController@login');
+    Route::post('logout', 'AuthController@logout');
+    Route::post('refresh', 'AuthController@refresh');
+    Route::post('me', 'AuthController@me');
+    Route::post('register', 'AuthController@register');
+
+});
