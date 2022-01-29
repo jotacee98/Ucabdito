@@ -45,5 +45,9 @@ Route::group([
     Route::resource('producto','ProductoController');
     Route::get('/getAllUsers ', 'UsuarioController@getAllUsers');
     Route::resource('usuario','UsuarioController');
-
+    Route::resource('carro','CarroController');
+    Route::post('/carro/add ', 'CarroController@add');
+    Route::post('/carro/remove ', 'CarroController@remove');
+    Route::get('/carro/getByUserId/{userId} ', 'CarroController@getByUserId');
+    Route::resource('pedido','PedidoController');
 });

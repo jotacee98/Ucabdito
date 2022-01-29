@@ -39,6 +39,7 @@ class UsuarioController extends Controller
     public function store(Request $request)
     {
         //INICIO DE LAS VALIDACIONES
+
         $rules =  [
             'first_name'    => 'required|String',
             'last_name'     => 'required|String',

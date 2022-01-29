@@ -88,13 +88,12 @@ class AuthController extends Controller
     }
 
     public function register(Request $request){
-
         //INICIO DE LAS VALIDACIONES
         $rules =  [
             'first_name'    => 'required|String',
             'last_name'     => 'required|String',
             'username'      => 'required|String',
-            'email'         => 'required|String|email',
+            'email'         => 'required|String',
             'password'      => 'required|String',
             'img.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ];      
