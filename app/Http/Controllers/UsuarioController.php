@@ -2,14 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Usuario;
+use App\User;
 use App\Tienda;
 use App\Sesiones;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class UsuarioController extends Controller
 {
+    /**
+     * Create a new AuthController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+       $this->middleware('auth:api', ['except' => ['']]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -29,6 +39,7 @@ class UsuarioController extends Controller
     public function store(Request $request)
     {
         //INICIO DE LAS VALIDACIONES
+
         $rules =  [
             'first_name'    => 'required|String',
             'last_name'     => 'required|String',
@@ -46,12 +57,12 @@ class UsuarioController extends Controller
             ];
         }
 
-        $usuario_username=Usuario::where('username',$request->input('username'))->get();
+        $user_username=User::where('username',$request->input('username'))->get();
 
-        if(sizeof($usuario_username)>0) return response()->json([ 'created' => false,'errors'=>['El nombre de usuario ya se encuentra registrado']]);
+        if(sizeof($user_username)>0) return response()->json([ 'created' => false,'errors'=>['El nombre de user ya se encuentra registrado']]);
         else{
-        $usuario_email=Usuario::where('email',$request->input('email'))->get();
-        if(sizeof($usuario_email)>0) return response()->json([ 'created' => false,'errors'=>['El email de usuario ya se encuentra registrado']]);
+        $user_email=User::where('email',$request->input('email'))->get();
+        if(sizeof($user_email)>0) return response()->json([ 'created' => false,'errors'=>['El email de user ya se encuentra registrado']]);
         }
 
         if($request->input('is_ucabista') && !strpos($request->input('email'),'ucab.edu.ve'))  return response()->json([ 'created' => false,'errors'=>['El correo ucabista debe de ser valido']]);
@@ -64,45 +75,41 @@ class UsuarioController extends Controller
         else                                        $is_not_ucabista=false;
 
         //return $request;
-        $usuario = new usuario();
-        $usuario->username                  = $request->input('username');
-        $usuario->first_name                = $request->input('first_name');
-        $usuario->last_name                 = $request->input('last_name');
-        $usuario->ruta_imagen_principal     = 'default.jpg';
-        $usuario->email                     = $request->input('email');
-        $usuario->password                  = md5($request->input('password'));
-        $usuario->is_ucabista               = $request->input('is_ucabista');
-        $usuario->is_not_ucabista           = !$request->input('is_ucabista');
-        $usuario->is_dueño                  = false;
-        $usuario->save();
+        $user = new user();
+        $user->username                  = $request->input('username');
+        $user->first_name                = $request->input('first_name');
+        $user->last_name                 = $request->input('last_name');
+        $user->ruta_imagen_principal     = 'default.jpg';
+        $user->email                     = $request->input('email');
+        $user->password                  = md5($request->input('password'));
+        $user->is_ucabista               = $request->input('is_ucabista');
+        $user->is_not_ucabista           = !$request->input('is_ucabista');
+        $user->is_dueño                  = false;
+        $user->save();
 
-        return response()->json(['message'=>'User Registered Successfully','usuario' => $usuario]);
+        return response()->json(['message'=>'User Registered Successfully','user' => $user]);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Usuario  $usuario
+     * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function show($username)
+    public function show($id)
     {
-        return Usuario::findOrFail($username);
+        return User::findOrFail($id);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Usuario  $usuario
+     * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        $token=$request->input('token');
-        $sesion= Sesiones::where('token',$token)->get();
-        if(sizeof($sesion)==0) return response()->json(['message'=>'Inicie sesion primero']);
-    
         //INICIO DE LAS VALIDACIONES
 
         //return $request;
@@ -127,17 +134,17 @@ class UsuarioController extends Controller
 
     
 
-        $usuario_username=Usuario::where('username',$request->input('username'))->get();
+        $user_username=User::where('username',$request->input('username'))->get();
 
-        if(sizeof($usuario_username)>0) return response()->json([ 'created' => false,'errors'=>['El nombre de usuario ya se encuentra registrado']]);
+        if(sizeof($user_username)>0) return response()->json([ 'created' => false,'errors'=>['El nombre de user ya se encuentra registrado']]);
         else{
-        $usuario_email=Usuario::where('email',$request->input('email'))->get();
-        if(sizeof($usuario_email)>0) return response()->json([ 'created' => false,'errors'=>['El email de usuario ya se encuentra registrado']]);
+        $user_email=User::where('email',$request->input('email'))->get();
+        if(sizeof($user_email)>0) return response()->json([ 'created' => false,'errors'=>['El email de user ya se encuentra registrado']]);
         }
         
-        $usuario=Usuario::findOrFail($id);    
+        $user=User::findOrFail($id);    
 
-        if($usuario->is_ucabita && !strpos($request->input('email'),'ucab.edu.ve'))  return response()->json([ 'created' => false,'errors'=>['El correo ucabista debe de ser valido']]);
+        if($user->is_ucabita && !strpos($request->input('email'),'ucab.edu.ve'))  return response()->json([ 'created' => false,'errors'=>['El correo ucabista debe de ser valido']]);
             //Fin de las validaciones
 
         //imagen_principal
@@ -148,15 +155,15 @@ class UsuarioController extends Controller
       
 
            
-        $usuario->username                  = $request->input('username');
-        $usuario->first_name                = $request->input('first_name');
-        $usuario->last_name                 = $request->input('last_name');
-        $usuario->ruta_imagen_principal     = $imagen_principal;
-        $usuario->email                     = $request->input('email');
-        $usuario->password                  = md5($request->input('password'));
-        $usuario->update();
+        $user->username                  = $request->input('username');
+        $user->first_name                = $request->input('first_name');
+        $user->last_name                 = $request->input('last_name');
+        $user->ruta_imagen_principal     = $imagen_principal;
+        $user->email                     = $request->input('email');
+        $user->password                  = md5($request->input('password'));
+        $user->update();
 
-        return response()->json([ 'updated' => true,'message'=>'User Updated Successfully','usuario' => $usuario]);
+        return response()->json([ 'updated' => true,'message'=>'User Updated Successfully','user' => $user]);
     }
 
     public function logOut(){
@@ -184,16 +191,16 @@ class UsuarioController extends Controller
         $email=$request->input('email');
         $password=md5($request->input('password'));
 
-        $usuario=Usuario::where(['email'=>$email,'password'=>$password])->get();
-        if(sizeof($usuario)==0) return response()->json([ 'login' => false,'errors'=>['No se encontro un usuario con las credenciales']]);
+        $user=User::where(['email'=>$email,'password'=>$password])->get();
+        if(sizeof($user)==0) return response()->json([ 'login' => false,'errors'=>['No se encontro un user con las credenciales']]);
     
         $token=md5($email.$password.date('His'));
         $session= new sesiones();
         $session->token=$token;
         $session->save();
-        $usuario->token=$token;
+        $user->token=$token;
 
-        return response()->json(['login' => true,'session' => $session,'usuario'=>$usuario]);
+        return response()->json(['login' => true,'session' => $session,'user'=>$user]);
     }
 
     public function storeDuenoDeNegocio(Request $request)
@@ -216,14 +223,14 @@ class UsuarioController extends Controller
                 'errors'  => $validator->errors()->all()
             ];
         }
-
-        $usuario_username=Usuario::where('username',$request->input('username'))
+        
+        $user_username=User::where('username',$request->input('username'))
                                     ->get();
 
-        if(sizeof($usuario_username)>0) return response()->json([ 'created' => false,'errors'=>['El nombre de usuario ya se encuentra registrado']]);
+        if(sizeof($user_username)>0) return response()->json([ 'created' => false,'errors'=>['El nombre de user ya se encuentra registrado']]);
         else{
-            $usuario_email=Usuario::where('email',$request->input('email'))->get();
-            if(sizeof($usuario_email)>0) return response()->json([ 'created' => false,'errors'=>['El email de usuario ya se encuentra registrado']]);
+            $user_email=User::where('email',$request->input('email'))->get();
+            if(sizeof($user_email)>0) return response()->json([ 'created' => false,'errors'=>['El email de user ya se encuentra registrado']]);
         }
         //Fin de las validaciones
 
@@ -233,32 +240,36 @@ class UsuarioController extends Controller
         $image->move(public_path().'/uploads/', $imagen_principal);
 
         $image_tienda=$request->file('imagen_tienda');
-        $image_tiendaprincipal = date('His').$image_tienda->getClientOriginalName();
-        $image_tienda->move(public_path().'/uploads/', $image_tiendaprincipal);
+        $image_tienda_principal = date('His').$image_tienda->getClientOriginalName();
+        $image_tienda->move(public_path().'/uploads/', $image_tienda_principal);
 
-        //return $request;
-        $usuario = new usuario();
-        $usuario->username                  = $request->input('username');
-        $usuario->first_name                = $request->input('first_name');
-        $usuario->last_name                 = $request->input('last_name');
-        $usuario->ruta_imagen_principal     = $imagen_principal;
-        $usuario->email                     = $request->input('email');
-        $usuario->password                  = md5($request->input('password'));
-        $usuario->is_ucabista               = false;
-        $usuario->is_not_ucabista           = false;
-        $usuario->is_dueño                  = true;
-        $usuario->save();
+        $user = new user();
+        $user->name                      ='empty';
+        $user->username                  = $request->input('username');
+        $user->first_name                = $request->input('first_name');
+        $user->last_name                 = $request->input('last_name');
+        $user->ruta_imagen_principal     = $imagen_principal;
+        $user->email                     = $request->input('email');
+        $user->password                  = bcrypt($request->input('password'));
+        $user->is_ucabista               = false;
+        $user->is_not_ucabista           = false;
+        $user->is_dueño                  = true;
+        $user->save();
 
 
 
         $tienda = new Tienda();
         $tienda->titulo                 = $request->input('titulo');
-        $tienda->ruta_imagen_home       = $image_tienda;
-        $tienda->ruta_imagen_principal  = $image_tienda;
-        $tienda->dueno_id               = $usuario->id;
+        $tienda->ruta_imagen_home       = $image_tienda_principal;
+        $tienda->ruta_imagen_principal  = $image_tienda_principal;
+        $tienda->dueno_id               = $user->id;
         $tienda->save();
 
-        return response()->json([ 'created' => true,'message'=>'User And Store Registered Successfully','usuario' => $usuario,'tienda'=>$tienda]);
+        return response()->json([ 'created' => true,'message'=>'User And Store Registered Successfully','user' => $user,'tienda'=>$tienda]);
+    }
+
+    public function getAllUsers(){
+        return DB::SELECT('SELECT id,username,email,is_ucabista  FROM users where is_dueño=? and email!=?',[false,'admin@admin.com']);
     }
 
 }

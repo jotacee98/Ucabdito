@@ -4,9 +4,22 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Producto;
+use App\Tienda;
 
 class ProductoController extends Controller
 {
+
+    /**
+     * Create a new AuthController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+       $this->middleware('auth:api', ['except' => ['']]);
+    }
+
+    
     /**
      * Display a listing of the resource.
      *
@@ -48,7 +61,7 @@ class ProductoController extends Controller
 
 
         //Imagen Principal
-        $image=$request->file('imagen_principal') ;
+        $image=$request->file('imagen_producto') ;
         $imagen_principal = date('His').$image->getClientOriginalName();
         $image->move(public_path().'/uploads/', $imagen_principal);
 
@@ -61,8 +74,8 @@ class ProductoController extends Controller
         $producto->descripcion               = $request->input('descripcion');
 
         $producto->save();
-
-        return response()->json(['message'=>'Product Registered Successfully','producto'=>$producto]);
+        $productos=Producto::where('tienda_id',$request->input('tienda_id'))->get();
+        return response()->json(['message'=>'Product Registered Successfully','productos'=>$productos]);
     }
 
     /**
@@ -90,7 +103,7 @@ class ProductoController extends Controller
             'cantidad' => 'required|Integer',
             'estado_publicado' => 'required|Integer',
             'descripcion' => 'required|String',
-            //'img.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            'img.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ];        
 
         
@@ -106,14 +119,13 @@ class ProductoController extends Controller
 
 
         //Imagen Principal
-      /*  $image=$request->file('imagen_principal') ;
+       $image=$request->file('imagen_producto') ;
         $imagen_principal = date('His').$image->getClientOriginalName();
-        $image->move(public_path().'/uploads/', $imagen_principal);*/
+        $image->move(public_path().'/uploads/', $imagen_principal);
 
         $producto=Producto::findOrFail($id);
         $producto->titulo                    = $request->input('titulo');
-       // $producto->ruta_imagen_principal     = $imagen_principal;
-        //$producto->tienda_id                 = $request->input('tienda_id');
+        $producto->ruta_imagen_principal     = $imagen_principal;
         $producto->cantidad                  = $request->input('cantidad');
         $producto->estado_publicado          = $request->input('estado_publicado');
         $producto->descripcion               = $request->input('descripcion');
@@ -124,6 +136,9 @@ class ProductoController extends Controller
     }
 
     public function getAllProductosByTiendaId($tienda_id){
-       return json_encode(Producto::where('tienda_id',$tienda_id)->get());
+        
+        $productos=Producto::where('tienda_id',$tienda_id)->get();
+        $tienda=Tienda::where('id',$tienda_id)->get();
+        return json_encode(['productos'=>$productos,'tienda' => $tienda]);
     }
 }
