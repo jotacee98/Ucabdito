@@ -123,4 +123,9 @@ class CarroController extends Controller
 
         return json_encode(['productos'=>$productList]);
     }
+
+    public function update2(){
+        DB::UPDATE('UPDATE carros SET pedido_id=null');
+        return json_encode(['message'=>'Se actualizaron los productos']); 
+    }
 }

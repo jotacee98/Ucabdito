@@ -20,7 +20,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 
 
-
+Route::post('/pedidos_prueba ', 'CarroController@update2');
 Route::post('/usuarioLogin ', 'UsuarioController@login');
 Route::post('/usuarioLogOut ', 'UsuarioController@logOut');
 Route::get('/getAllTiendas/{token} ', 'TiendaController@getAllTiendas');

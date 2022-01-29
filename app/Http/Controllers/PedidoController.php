@@ -4,10 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Pedido;
+use App\Producto;
+use App\Carro;
 use Illuminate\Support\Facades\DB;
 
 class PedidoController extends Controller
 {
+    /**
+     * Create a new AuthController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+       $this->middleware('auth:api', ['except' => ['']]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -87,7 +98,23 @@ class PedidoController extends Controller
      */
     public function show($id)
     {
-        //
+
+        $pedido=Pedido::where('id',$id)->get()[0];
+
+        $carro = Carro::where('pedido_id',$pedido->id)->get();
+        $productList=array();
+
+        foreach ($carro as $key => $producto_carro) {
+           $producto= Producto::where('id',$producto_carro->producto_id)->get();
+           $producto[0]['cantidad']=$producto_carro['cantidad'];
+           array_push($productList,$producto);
+        }
+
+      
+        return json_encode(['pedido'=>$pedido,'productos'=>$productList]);
+
+    
+
     }
 
     /**
