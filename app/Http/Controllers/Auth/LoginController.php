@@ -37,7 +37,7 @@ class LoginController extends Controller
     }
 
     public function showLoginForm(){
-        return response()->json(['message'=>'Inicie Sesion Primero',]);
+        return response()->json(['message'=>'Inicie Sesion Primero'],401);
     }
 
 }
