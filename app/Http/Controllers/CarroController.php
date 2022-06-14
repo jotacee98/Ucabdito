@@ -86,16 +86,19 @@ class CarroController extends Controller
 
     public function getByUserId($userId){
 
-        $carro=Carro::where('usuario_id',$userId)->get();
+        $carro=DB::SELECT('SELECT * FROM carros WHERE usuario_id=? AND pedido_id IS NULL',[$userId]);
         $productList=array();
 
+        $total=0;
         foreach ($carro as $key => $producto_carro) {
            $producto= Producto::where('id',$producto_carro->producto_id)->get();
-           $producto[0]['cantidad']=$producto_carro['cantidad'];
+           //$producto= DB::SELECT('SELECT * FROM carros WHERE id=? AND pedido_id IS NULL',[$producto_carro->producto_id]);
+           $producto[0]['cantidad']=$producto_carro->cantidad;
            array_push($productList,$producto);
+           $total=$total+($producto_carro->cantidad*$producto_carro->cantidad);
         }
-
-        return json_encode(['productos'=>$productList]);
+        
+        return json_encode(['productos'=>$productList,'total'=>$total]);
     }
 
     public function add(Request $request){
@@ -113,7 +116,8 @@ class CarroController extends Controller
         $productId= $request->input('producto_id');
         DB::DELETE('DELETE FROM carros WHERE usuario_id=? AND producto_id=?',[$userId,$productId]);
         
-        $carro=Carro::where('usuario_id',$userId)->get();
+        //$carro=Carro::where('usuario_id',$userId)->get();
+        $carro=DB::SELECT('SELECT * FROM carros WHERE usuario_id=? AND pedido_id IS NULL',[$userId]);
         $productList=array();
 
         foreach ($carro as $key => $producto_carro) {
